@@ -1,0 +1,26 @@
+    1  dir
+    2  gcloud services enable cloudbuild.googleapis.com
+    3  gcloud services list --enabled
+    4  gcloud services list --enabled | grep -E "pubsub|cloudfunctions|bigquery|cloudbuild"
+    5  gcloud config set project iot-data-pipeline-495413
+    6  gcloud pubsub topics create iot-sensor-topic
+    7  gcloud pubsub subscriptions create iot-sensor-sub
+    8  gcloud pubsub subscriptions create iot-sensor-sub   --topic=iot-sensor-topic
+    9  gcloud pubsub topics list 
+   10  gcloud pubsub subscriptions list
+   11  gcloud pubsub topics publish iot-sensor-topic   --message='{"device_id":"sensor_01","temperature":28,"humidity":60,"motion":true}'
+   12  gcloud pubsub subscriptions pull iot-sensor-sub   --limit=1   --auto-ack
+   13  mkdir iot-function 
+   14  cd iot-function/
+   15  gcloud functions deploy process_iot_data --runtime python310 --trigger-topic iot-sensor-topic --entry-point process_iot_data --region=us-central1
+   16  gcloud pubsub topics publish iot-sensor-topic --message='{"device_id":"sensor_01","temperature":30,"humidity":55,"motion":true}'
+   17  bq query --use_legacy_sql=false 'SELECT * FROM `YOUR_PROJECT_ID.iot_dataset.sensor_data`'
+   18  bq query --use_legacy_sql=false 'SELECT * FROM `iot-data-pipeline-495413.iot_dataset.sensor_data`'
+   19  bq mk iot_dataset
+   20  bq mk --table iot_dataset.sensor_data device_id:STRING,temperature:FLOAT,humidity:FLOAT,motion:BOOLEAN
+   21  bq ls iot_dataset
+   22  gcloud functions deploy process_iot_data --runtime python310 --trigger-topic iot-sensor-topic --entry-point process_iot_data --region=us-central1
+   23  gcloud pubsub topics publish iot-sensor-topic --message='{"device_id":"sensor_01","temperature":30,"humidity":55,"motion":true}'
+   24  bq query --use_legacy_sql=false 'SELECT * FROM `iot-data-pipeline-495413.iot_dataset.sensor_data`'
+   25  bq query --use_legacy_sql=false 'SELECT * FROM `iot-data-pipeline-495413.iot_dataset.sensor_data` LIMIT 10'
+   26  history > my_commands.txt
